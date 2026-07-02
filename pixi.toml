@@ -1,0 +1,26 @@
+[workspace]
+name = "aravis"
+version = "0.9.3"
+description = "Pixi environment for building and packaging Aravis for prefix.dev"
+channels = ["conda-forge", "https://prefix.dev/robostack-jazzy"]
+platforms = ["linux-64"]
+
+[dependencies]
+c-compiler = "*"
+cxx-compiler = "*"
+meson = "*"
+ninja = "*"
+pkg-config = "*"
+glib = "*"
+libxml2 = "*"
+zlib = "*"
+libusb = "*"
+rattler-build = "*"
+
+[tasks]
+configure = "meson setup .pixi/build ${MESON_ARGS} -Ddocumentation=disabled -Dgst-plugin=disabled -Dintrospection=disabled -Dtests=false -Dusb=enabled -Dviewer=disabled"
+build = "meson compile -C .pixi/build -v"
+install = "DESTDIR= . true"
+conda-render = "rattler-build build -r recipe/recipe.yaml --render-only -c conda-forge -c https://prefix.dev/robostack-jazzy"
+conda-build = "mkdir -p dist && rattler-build build -r recipe/recipe.yaml -c conda-forge -c https://prefix.dev/robostack-jazzy --test skip --output-dir dist"
+conda-smoke = "bash -lc 'set -euo pipefail; pkg=$(find dist -name \"aravis-*.conda\" | head -n 1); test -n \"${pkg}\"; rattler-build test \"${pkg}\"'"

@@ -1,0 +1,49 @@
+context:
+  version: 0.9.3
+
+package:
+  name: aravis
+  version: ${{ version }}
+
+source:
+  path: ..
+
+build:
+  number: 0
+  script:
+    - meson setup build ${MESON_ARGS} -Ddocumentation=disabled -Dgst-plugin=disabled -Dintrospection=disabled -Dtests=false -Dusb=enabled -Dviewer=disabled
+    - meson compile -C build -v
+    - meson install -C build
+
+requirements:
+  build:
+    - ${{ compiler('c') }}
+    - ${{ compiler('cxx') }}
+    - meson
+    - ninja
+    - pkg-config
+  host:
+    - glib
+    - libxml2-devel
+    - zlib
+    - libusb
+  run:
+    - glib
+    - libxml2
+    - zlib
+    - libusb
+
+tests:
+  - script:
+      - test -f ${PREFIX}/lib/libaravis-0.10.so
+      - pkg-config --exists aravis-0.10
+    requirements:
+      run:
+        - pkg-config
+        - libxml2-devel
+
+about:
+  homepage: https://github.com/AravisProject/aravis
+  repository: https://github.com/Gabriel-Ning/aravis
+  summary: GLib/GObject-based GenICam camera library with GigE Vision and USB3 Vision support.
+  license: LGPL-2.1-or-later
